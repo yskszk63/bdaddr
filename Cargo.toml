@@ -1,0 +1,16 @@
+[package]
+name = "bdaddr"
+version = "0.1.0"
+authors = ["yskszk63 <yskszk63@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1.0"
+generic-array = { version = "0.14", optional = true }
+aes = { version = "0.6", optional = true }
+
+[features]
+default = []
+matches = ["generic-array", "aes"]
