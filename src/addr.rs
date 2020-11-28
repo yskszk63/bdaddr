@@ -8,11 +8,13 @@ pub use matches::InvalidAddressType;
 #[cfg(feature = "matches")]
 mod matches;
 
+/// Parse error for [`Address::from_str`]
 #[derive(Debug, thiserror::Error)]
 #[error("failed to parse address")]
 pub struct AddressParseError;
 
-#[derive(Clone, PartialEq, Eq)]
+/// Bluetooth Device Address
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Address([u8; 6]);
 
 impl From<[u8; 6]> for Address {

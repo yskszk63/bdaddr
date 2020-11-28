@@ -3,15 +3,13 @@ use generic_array::GenericArray;
 
 use super::Address;
 
+/// Self is not resolvable random address error for [`Address::matches`].
 #[derive(Debug, thiserror::Error)]
 #[error("invalid address type")]
 pub struct InvalidAddressType;
 
-// https://github.com/bluez/bluez/blob/0a259dd05b88f65c77b3d7e1e097ba42288e68ca/tools/advtest.c
-
-// NewIdentityResolvingKey(NewIdentityResolvingKey { store_hint: true, random_address: Address([158, 21, 65, 67, 127, 116]), key: IdentityResolvingKey { address: Address([251, 128, 41, 109, 40, 60]), address_type: LePublic, value: [25, 120, 162, 175, 221, 117, 123, 237, 252, 157, 198, 158, 149, 215, 51, 179] } })
-
 impl Address {
+    /// Test matches Identity Resolving Key.
     pub fn matches(&self, irk: &[u8; 16]) -> Result<bool, InvalidAddressType> {
         if (self.0[5] & 0xc0) != 0x40 {
             return Err(InvalidAddressType);
