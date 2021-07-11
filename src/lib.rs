@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bdaddr/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/bdaddr/0.1.1")]
 //! Bluetooth Device Address.
 //!
 //! ## Dependencies
