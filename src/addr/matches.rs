@@ -1,5 +1,5 @@
-use aes::{Aes128, BlockCipher, NewBlockCipher};
-use generic_array::GenericArray;
+use aes::cipher::generic_array::GenericArray;
+use aes::{Aes128, BlockEncrypt, NewBlockCipher};
 
 use super::Address;
 

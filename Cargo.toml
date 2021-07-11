@@ -7,16 +7,15 @@ description = "Bluetooth Device Address."
 repository = "https://github.com/yskszk63/bdaddr"
 license = "MIT OR Apache-2.0"
 keywords = ["bluetooth"]
-category = ["data-structures"]
+categories = ["data-structures"]
 
 [dependencies]
 thiserror = "1.0"
-generic-array = { version = "0.14", optional = true }
-aes = { version = "0.6", optional = true }
+aes = { version = "0.7", optional = true }
 
 [features]
 default = []
-matches = ["generic-array", "aes"]
+matches = ["aes"]
 
 [package.metadata.docs.rs]
 all-features = true
