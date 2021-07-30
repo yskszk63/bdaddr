@@ -8,6 +8,7 @@ repository = "https://github.com/yskszk63/bdaddr"
 license = "MIT OR Apache-2.0"
 keywords = ["bluetooth"]
 categories = ["data-structures"]
+resolver = "2"
 
 [dependencies]
 thiserror = "1.0"
@@ -19,3 +20,4 @@ matches = ["aes"]
 
 [package.metadata.docs.rs]
 all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
