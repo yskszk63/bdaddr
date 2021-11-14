@@ -13,9 +13,39 @@ mod matches;
 #[error("failed to parse address")]
 pub struct AddressParseError;
 
+/// Sub-types of random device address.
+///
+/// BLUETOOTH CORE SPECIFICATION | Vol 6, Part B | 1.3.2 Random device address - Table 1.2
+pub enum SubType {
+    /// Non-Resolvable private address
+    NonResolvable,
+
+    /// Resolvable private address
+    Resolvable,
+
+    /// Reserved for future use
+    Reserved,
+
+    /// Static device address
+    Static,
+}
+
 /// Bluetooth Device Address
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Address([u8; 6]);
+
+impl Address {
+    /// Get Sub-types of random device address, If this address is random address.
+    pub fn sub_type(&self) -> SubType {
+        // TODO test
+        match (self.0[5] & 0xc0) >> 6 {
+            0x00 => SubType::NonResolvable,
+            0x01 => SubType::Resolvable,
+            0x04 => SubType::Static,
+            _ => SubType::Reserved,
+        }
+    }
+}
 
 impl From<[u8; 6]> for Address {
     fn from(v: [u8; 6]) -> Self {
