@@ -1,8 +1,6 @@
 #![doc(html_root_url = "https://docs.rs/bdaddr/0.1.2")]
 //! Bluetooth Device Address.
 //!
-//! BLUETOOTH CORE SPECIFICATION | Vol 6, Part B | 1.3 DEVICE ADDRESS
-//!
 //! ## Dependencies
 //!
 //! ```toml
@@ -35,8 +33,9 @@
 //! Unless you explicitly state otherwise, any contribution intentionally submitted
 //! for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 //! dual licensed as above, without any additional terms or conditions.!
-#[cfg(feature = "matches")]
-pub use addr::InvalidAddressType;
-pub use addr::{Address, AddressParseError, SubType};
+pub use addr::{
+    Address, AddressParseError, NonResolvablePrivateAddress, PublicDeviceAddress,
+    RandomDeviceAddress, ResolvablePrivateAddress, StaticDeviceAddress,
+};
 
 mod addr;
