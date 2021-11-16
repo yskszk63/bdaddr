@@ -23,11 +23,12 @@ impl ResolvablePrivateAddress {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::convert::TryFrom;
 
     #[test]
     fn test() {
         // TODO Construct RPA from bytes.
-        let addr = ResolvablePrivateAddress::from([130, 189, 188, 140, 3, 83]);
+        let addr = ResolvablePrivateAddress::try_from([130, 189, 188, 140, 3, 83]).unwrap();
         let irk = [
             25, 120, 162, 175, 221, 117, 123, 237, 252, 157, 198, 158, 149, 215, 51, 179,
         ];

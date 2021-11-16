@@ -10,6 +10,11 @@ mod matches;
 #[error("failed to parse address")]
 pub struct AddressParseError;
 
+/// Invalid bits for this address type.
+#[derive(Debug, thiserror::Error)]
+#[error("Invalid bits for this address type. (expect: 0b{0:02b}, but 0b{1:02b})")]
+pub struct InvalidBitsForAddressType(u8, u8);
+
 /// BD Address
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct RawAddress([u8; 6]);
@@ -84,6 +89,22 @@ impl fmt::Display for PublicDeviceAddress {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NonResolvablePrivateAddress(RawAddress);
 
+impl NonResolvablePrivateAddress {
+    const TAG: u8 = 0b00;
+}
+
+impl TryFrom<[u8; 6]> for NonResolvablePrivateAddress {
+    type Error = InvalidBitsForAddressType;
+
+    fn try_from(v: [u8; 6]) -> Result<Self, Self::Error> {
+        if (v[5] & 0xC0) >> 6 == Self::TAG {
+            Ok(Self(v.into()))
+        } else {
+            Err(InvalidBitsForAddressType(Self::TAG, (v[5] & 0xC0) >> 6))
+        }
+    }
+}
+
 impl fmt::Display for NonResolvablePrivateAddress {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
@@ -94,6 +115,22 @@ impl fmt::Display for NonResolvablePrivateAddress {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ResolvablePrivateAddress(RawAddress);
 
+impl ResolvablePrivateAddress {
+    const TAG: u8 = 0b01;
+}
+
+impl TryFrom<[u8; 6]> for ResolvablePrivateAddress {
+    type Error = InvalidBitsForAddressType;
+
+    fn try_from(v: [u8; 6]) -> Result<Self, Self::Error> {
+        if (v[5] & 0xC0) >> 6 == Self::TAG {
+            Ok(Self(v.into()))
+        } else {
+            Err(InvalidBitsForAddressType(Self::TAG, (v[5] & 0xC0) >> 6))
+        }
+    }
+}
+
 impl fmt::Display for ResolvablePrivateAddress {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
@@ -103,6 +140,22 @@ impl fmt::Display for ResolvablePrivateAddress {
 /// LE Static Device Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StaticDeviceAddress(RawAddress);
+
+impl StaticDeviceAddress {
+    const TAG: u8 = 0b11;
+}
+
+impl TryFrom<[u8; 6]> for StaticDeviceAddress {
+    type Error = InvalidBitsForAddressType;
+
+    fn try_from(v: [u8; 6]) -> Result<Self, Self::Error> {
+        if (v[5] & 0xC0) >> 6 == Self::TAG {
+            Ok(Self(v.into()))
+        } else {
+            Err(InvalidBitsForAddressType(Self::TAG, (v[5] & 0xC0) >> 6))
+        }
+    }
+}
 
 impl fmt::Display for StaticDeviceAddress {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -129,9 +182,11 @@ pub enum RandomDeviceAddress {
 impl RandomDeviceAddress {
     fn new(addr: RawAddress) -> Self {
         match (addr.0[5] & 0xC0) >> 6 {
-            0b00 => Self::NonResolvable(NonResolvablePrivateAddress(addr)),
-            0b10 => Self::Resolvable(ResolvablePrivateAddress(addr)),
-            0b11 => Self::Static(StaticDeviceAddress(addr)),
+            NonResolvablePrivateAddress::TAG => {
+                Self::NonResolvable(NonResolvablePrivateAddress(addr))
+            }
+            ResolvablePrivateAddress::TAG => Self::Resolvable(ResolvablePrivateAddress(addr)),
+            StaticDeviceAddress::TAG => Self::Static(StaticDeviceAddress(addr)),
             _ => Self::Unknown(addr),
         }
     }
@@ -225,5 +280,117 @@ mod tests {
     fn test_parse() {
         let addr = "55:44:33:22:11:00".parse().unwrap();
         assert_eq!(RawAddress::from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]), addr);
+    }
+
+    #[test]
+    fn test_bredr_parse() {
+        let addr = Address::bredr_from_str("55:44:33:22:11:00").unwrap();
+        assert_eq!("55:44:33:22:11:00", addr.to_string());
+        assert!(matches!(addr, Address::BrEdr(..)));
+
+        assert!(Address::bredr_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_le_public_parse() {
+        let addr = Address::le_public_from_str("55:44:33:22:11:00").unwrap();
+        assert_eq!("55:44:33:22:11:00", addr.to_string());
+        assert!(matches!(addr, Address::LePublic(..)));
+
+        assert!(Address::le_public_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_le_random_nonresolvable_parse() {
+        let addr = Address::le_random_from_str("35:44:33:22:11:00").unwrap();
+        assert_eq!("35:44:33:22:11:00", addr.to_string());
+        assert!(matches!(
+            addr,
+            Address::LeRandom(RandomDeviceAddress::NonResolvable(..))
+        ));
+
+        assert!(Address::le_random_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_le_random_resolvable_parse() {
+        let addr = Address::le_random_from_str("75:44:33:22:11:00").unwrap();
+        assert_eq!("75:44:33:22:11:00", addr.to_string());
+        assert!(matches!(
+            addr,
+            Address::LeRandom(RandomDeviceAddress::Resolvable(..))
+        ));
+
+        assert!(Address::le_random_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_le_random_static_parse() {
+        let addr = Address::le_random_from_str("F5:44:33:22:11:00").unwrap();
+        assert_eq!("f5:44:33:22:11:00", addr.to_string());
+        assert!(matches!(
+            addr,
+            Address::LeRandom(RandomDeviceAddress::Static(..))
+        ));
+
+        assert!(Address::le_random_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_le_random_unknown_parse() {
+        let addr = Address::le_random_from_str("B5:44:33:22:11:00").unwrap();
+        assert_eq!("b5:44:33:22:11:00", addr.to_string());
+        assert!(matches!(
+            addr,
+            Address::LeRandom(RandomDeviceAddress::Unknown(..))
+        ));
+
+        assert!(Address::le_random_from_str("ZZ:ZZ:ZZ:ZZ:ZZ:ZZ").is_err());
+    }
+
+    #[test]
+    fn test_bredr_from() {
+        let addr = Address::bredr_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(matches!(addr, Address::BrEdr(..)));
+    }
+
+    #[test]
+    fn test_le_public_from() {
+        let addr = Address::le_public_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(matches!(addr, Address::LePublic(..)));
+    }
+
+    #[test]
+    fn test_le_random_from() {
+        let addr = Address::le_random_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(matches!(addr, Address::LeRandom(..)));
+    }
+
+    #[test]
+    fn test_non_resolvable_try_from() {
+        let addr = NonResolvablePrivateAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x35]);
+        assert!(matches!(addr, Ok(NonResolvablePrivateAddress(..))));
+
+        let addr = NonResolvablePrivateAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(matches!(addr, Err(InvalidBitsForAddressType(0b00, 0b01))));
+    }
+
+    #[test]
+    fn test_resolvable_try_from() {
+        let addr = ResolvablePrivateAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(matches!(addr, Ok(ResolvablePrivateAddress(..))));
+
+        let addr = ResolvablePrivateAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0xB5]);
+        assert!(matches!(addr, Err(InvalidBitsForAddressType(0b01, 0b10))));
+    }
+
+    #[test]
+    fn test_static_try_from() {
+        let addr = StaticDeviceAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0xF5]);
+        assert!(matches!(addr, Ok(StaticDeviceAddress(..))));
+
+        let addr = StaticDeviceAddress::try_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x05]);
+        println!("{:?}", addr);
+        assert!(matches!(addr, Err(InvalidBitsForAddressType(0b11, 0b00))));
     }
 }

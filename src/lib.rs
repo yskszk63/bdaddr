@@ -11,11 +11,12 @@
 //! ## Example
 //!
 //! ```
-//! use bdaddr::Address;
+//! use bdaddr::{Address, RandomDeviceAddress, StaticDeviceAddress};
 //!
 //! fn main() {
-//!     let addr = "00:11:22:33:44:55".parse::<Address>().unwrap();
+//!     let addr = Address::le_random_from_str("00:11:22:33:44:55").unwrap();
 //!     assert_eq!(addr.to_string(), "00:11:22:33:44:55");
+//!     assert!(matches!(addr, Address::LeRandom(RandomDeviceAddress::NonResolvable(..))));
 //! }
 //! ```
 //!
