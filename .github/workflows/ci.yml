@@ -56,7 +56,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - version: 1.31 # Initial Rust 2018 Edition
+        - version: 1.32 # macro_at_most_once_rep (needs cpufeatures)
         - version: stable
         - version: nightly
     steps:
@@ -80,7 +80,7 @@ jobs:
 
     - uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: nightly
         override: true
         profile: minimal
 
