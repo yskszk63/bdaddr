@@ -9,6 +9,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["bluetooth"]
 categories = ["data-structures"]
 resolver = "2"
+rust-version = "1.51"
 
 [dependencies]
 thiserror = "1.0"
