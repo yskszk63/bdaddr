@@ -56,7 +56,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - version: 1.49 # ManuallyDrop in union (needs aes)
+        - version: 1.50 # Cargo resolver feature
         - version: stable
         - version: nightly
     steps:
