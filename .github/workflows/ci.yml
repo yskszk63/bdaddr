@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+#    - main
+  pull_request:
+
+jobs:
+  check-fmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        profile: minimal
+        components: rustfmt
+
+    - name: Check format
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        profile: minimal
+        components: clippy
+
+    - uses: actions-rs/clippy-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --all-features
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions-rs/audit-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+        - version: 1.31 # Initial Rust 2018 Edition
+        - version: stable
+        - version: nightly
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.version }}
+        override: true
+        profile: minimal
+
+    - uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --no-fail-fast --all-features
+
+  cov:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        profile: minimal
+
+    - run: curl -LsSf https://github.com/taiki-e/cargo-llvm-cov/releases/latest/download/cargo-llvm-cov-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
+
+    - uses: actions-rs/cargo@v1
+      with:
+        command: llvm-cov
+        args: --all-features --lcov --output-path lcov.info
+
+    - uses: codecov/codecov-action@v2
+      with:
+        files: lcov.info
+        fail_ci_if_error: true
