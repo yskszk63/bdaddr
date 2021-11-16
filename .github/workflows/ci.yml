@@ -56,7 +56,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - version: 1.42 # matches! macro
+        - version: 1.49 # ManuallyDrop in union (needs aes)
         - version: stable
         - version: nightly
     steps:
