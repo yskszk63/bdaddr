@@ -56,7 +56,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - version: 1.36 # maybe_uninit (needs generic-array)
+        - version: 1.42 # matches! macro
         - version: stable
         - version: nightly
     steps:
