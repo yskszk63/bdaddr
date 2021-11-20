@@ -2,14 +2,14 @@
 name = "bdaddr"
 version = "0.1.2"
 authors = ["yskszk63 <yskszk63@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Bluetooth Device Address."
 repository = "https://github.com/yskszk63/bdaddr"
 license = "MIT OR Apache-2.0"
 keywords = ["bluetooth"]
 categories = ["data-structures"]
 resolver = "2"
-rust-version = "1.51"
+rust-version = "1.56"
 
 [dependencies]
 thiserror = "1.0"

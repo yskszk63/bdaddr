@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SOME BREAKING CHANGES.
 - Significantly revised the structure to clearly indicate the type (Classic / LE Public / LE Random).
 - The old `Address` struct has been renamed to `RawAddress`.
+- Change MSRV to 1.56 (2021 edition)
 
 ## [0.1.2] - 2021-09-23
 
