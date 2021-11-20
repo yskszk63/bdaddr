@@ -1,6 +1,6 @@
 [package]
 name = "bdaddr"
-version = "0.1.2"
+version = "0.2.0-alpha.1"
 authors = ["yskszk63 <yskszk63@gmail.com>"]
 edition = "2021"
 description = "Bluetooth Device Address."
