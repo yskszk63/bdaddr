@@ -17,21 +17,21 @@ pub struct InvalidBitsForAddressType(u8, u8);
 
 /// BD Address
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct RawAddress([u8; 6]);
+pub struct BdAddr([u8; 6]);
 
-impl From<[u8; 6]> for RawAddress {
+impl From<[u8; 6]> for BdAddr {
     fn from(v: [u8; 6]) -> Self {
         Self(v)
     }
 }
 
-impl From<RawAddress> for [u8; 6] {
-    fn from(v: RawAddress) -> Self {
+impl From<BdAddr> for [u8; 6] {
+    fn from(v: BdAddr) -> Self {
         v.0
     }
 }
 
-impl fmt::Display for RawAddress {
+impl fmt::Display for BdAddr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -41,13 +41,13 @@ impl fmt::Display for RawAddress {
     }
 }
 
-impl fmt::Debug for RawAddress {
+impl fmt::Debug for BdAddr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self)
     }
 }
 
-impl FromStr for RawAddress {
+impl FromStr for BdAddr {
     type Err = AddressParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -61,7 +61,7 @@ impl FromStr for RawAddress {
     }
 }
 
-impl TryFrom<&str> for RawAddress {
+impl TryFrom<&str> for BdAddr {
     type Error = AddressParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
@@ -71,7 +71,7 @@ impl TryFrom<&str> for RawAddress {
 
 /// LE Public Device Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PublicDeviceAddress(RawAddress);
+pub struct PublicDeviceAddress(BdAddr);
 
 impl From<[u8; 6]> for PublicDeviceAddress {
     fn from(v: [u8; 6]) -> Self {
@@ -87,7 +87,7 @@ impl fmt::Display for PublicDeviceAddress {
 
 /// LE Non-Resolvable Private Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct NonResolvablePrivateAddress(RawAddress);
+pub struct NonResolvablePrivateAddress(BdAddr);
 
 impl NonResolvablePrivateAddress {
     const TAG: u8 = 0b00;
@@ -113,7 +113,7 @@ impl fmt::Display for NonResolvablePrivateAddress {
 
 /// LE Resolvable Private Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ResolvablePrivateAddress(RawAddress);
+pub struct ResolvablePrivateAddress(BdAddr);
 
 impl ResolvablePrivateAddress {
     const TAG: u8 = 0b01;
@@ -139,7 +139,7 @@ impl fmt::Display for ResolvablePrivateAddress {
 
 /// LE Static Device Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct StaticDeviceAddress(RawAddress);
+pub struct StaticDeviceAddress(BdAddr);
 
 impl StaticDeviceAddress {
     const TAG: u8 = 0b11;
@@ -176,11 +176,11 @@ pub enum RandomDeviceAddress {
     Static(StaticDeviceAddress),
 
     /// Unknown
-    Unknown(RawAddress),
+    Unknown(BdAddr),
 }
 
 impl RandomDeviceAddress {
-    fn new(addr: RawAddress) -> Self {
+    fn new(addr: BdAddr) -> Self {
         match (addr.0[5] & 0xC0) >> 6 {
             NonResolvablePrivateAddress::TAG => {
                 Self::NonResolvable(NonResolvablePrivateAddress(addr))
@@ -213,7 +213,7 @@ impl fmt::Display for RandomDeviceAddress {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Address {
     /// Classic BR/EDR Address
-    BrEdr(RawAddress),
+    BrEdr(BdAddr),
 
     /// LE Public Device Address
     LePublic(PublicDeviceAddress),
@@ -272,14 +272,14 @@ mod tests {
 
     #[test]
     fn test_display() {
-        let addr = RawAddress::from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        let addr = BdAddr::from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
         assert_eq!("55:44:33:22:11:00", addr.to_string());
     }
 
     #[test]
     fn test_parse() {
         let addr = "55:44:33:22:11:00".parse().unwrap();
-        assert_eq!(RawAddress::from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]), addr);
+        assert_eq!(BdAddr::from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]), addr);
     }
 
     #[test]
