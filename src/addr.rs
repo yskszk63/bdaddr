@@ -5,7 +5,7 @@ use std::str::FromStr;
 #[cfg(feature = "matches")]
 mod matches;
 
-/// Parse error for [`Address::from_str`]
+/// Parse error for [`BdAddr::from_str`]
 #[derive(Debug, thiserror::Error)]
 #[error("failed to parse address")]
 pub struct AddressParseError;
