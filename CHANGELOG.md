@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `RawAddress` (`Address` at v0.1.x) struct has been renamed to `BdAddr`.
+- Added some conversion function between structs.
 
 ## [0.2.0-alpha.1] - 2021-11-20
 
