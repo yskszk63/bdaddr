@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0-alpha.3] - 2021-12-09
+
+### Added
+
+- `AddressType` struct.
+
 ## [0.2.0-alpha.2] - 2021-11-23
 
 ### Changed
@@ -42,8 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial Release
 
-[Unreleased]: https://github.com/yskszk63/bdaddr/compare/v0.2.0-alpha.2...HEAD
-[0.2.0-alpha.1]: https://github.com/yskszk63/bdaddr/compare/v0.2.0-alpha.1...v0.2.0-alpha.2
+[Unreleased]: https://github.com/yskszk63/bdaddr/compare/v0.2.0-alpha.3...HEAD
+[0.2.0-alpha.3]: https://github.com/yskszk63/bdaddr/compare/v0.2.0-alpha.2...v0.2.0-alpha.3
+[0.2.0-alpha.2]: https://github.com/yskszk63/bdaddr/compare/v0.2.0-alpha.1...v0.2.0-alpha.2
 [0.2.0-alpha.1]: https://github.com/yskszk63/bdaddr/compare/v0.1.2...v0.2.0-alpha.1
 [0.1.2]: https://github.com/yskszk63/bdaddr/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/yskszk63/bdaddr/compare/v0.1.0...v0.1.1
