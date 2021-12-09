@@ -11,7 +11,7 @@ Bluetooth Device Address.
 
 ```toml
 [dependencies]
-bdaddr = "0.2.0-alpha.3"
+bdaddr = "0.2.0-alpha.4"
 ```
 
 ### Example
