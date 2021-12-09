@@ -256,6 +256,19 @@ impl fmt::Display for RandomDeviceAddress {
     }
 }
 
+/// Address type for [`Address`]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AddressType {
+    /// Classic BR/EDR Address
+    BrEdr,
+
+    /// LE Public Device Address
+    LePublic,
+
+    /// LE Random Device Address
+    LeRandom,
+}
+
 /// Bluetooth Device Address
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Address {
@@ -315,6 +328,15 @@ impl Address {
             Self::LeRandom(RandomDeviceAddress::Resolvable(ResolvablePrivateAddress(addr))) => addr,
             Self::LeRandom(RandomDeviceAddress::Static(StaticDeviceAddress(addr))) => addr,
             Self::LeRandom(RandomDeviceAddress::Unknown(addr)) => addr,
+        }
+    }
+
+    /// Get address type.
+    pub fn address_type(&self) -> AddressType {
+        match self {
+            Self::BrEdr(..) => AddressType::BrEdr,
+            Self::LePublic(..) => AddressType::LePublic,
+            Self::LeRandom(..) => AddressType::LeRandom,
         }
     }
 }
@@ -602,5 +624,18 @@ mod tests {
             .unwrap()
             .into_bd_addr();
         assert_eq!(BdAddr::try_from("B5:44:33:22:11:00").unwrap(), addr);
+    }
+
+    #[test]
+    fn test_address_type() {
+        let ty = Address::bredr_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]).address_type();
+        assert_eq!("BrEdr", format!("{:?}", ty));
+        assert_eq!(AddressType::BrEdr, ty);
+        let ty = Address::le_public_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]).address_type();
+        assert_eq!("LePublic", format!("{:?}", ty));
+        assert_eq!(AddressType::LePublic, ty);
+        let ty = Address::le_random_from([0x00, 0x11, 0x22, 0x33, 0x44, 0x55]).address_type();
+        assert_eq!("LeRandom", format!("{:?}", ty));
+        assert_eq!(AddressType::LeRandom, ty);
     }
 }
